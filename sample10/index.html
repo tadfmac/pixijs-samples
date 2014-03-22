@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>pixi.js ex#10</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<style>
+body {
+	margin: 0;
+	padding: 0;
+	background-color: #333;
+	color:#FFF;
+}
+#pixiview {
+	margin: 0 auto;
+	padding: 0;
+	width:600px;
+	height:400px;
+}
+#logo {
+	position:absolute;
+	bottom:15px;
+	right:15px;
+}
+
+</style>
+<script src="pixi.dev.js"></script>
+</head>
+<body>
+<p>コンテナを使ってみる</p>
+<div id="pixiview"></div>
+<a href="http://www.pixijs.com/"><img id="logo" src="img/pixilogo.png" width="56px" height="22px"></a>
+<script>
+var width = 600;
+var height = 400;
+
+// ステージ・レンダラーを作ってDOMに配置
+var stage = new PIXI.Stage('black');
+var renderer = PIXI.autoDetectRenderer(width, height);
+document.getElementById("pixiview").appendChild(renderer.view);
+
+// コンテナを2つつくる。(for文かよw)
+var containers = [];
+for (var i=0;i < 2; i++){
+  containers[i] = new PIXI.DisplayObjectContainer();
+  containers[i].position.x = 100+(i*300);
+  containers[i].position.y = 50+(i*100);
+  stage.addChild(containers[i]);
+}
+
+// 画像からスプライトオブジェクトを作る
+var framenames = [
+  "test_r1_c1.png",
+  "test_r1_c2.png",
+  "test_r1_c3.png",
+  "test_r1_c4.png",
+  "test_r2_c1.png",
+  "test_r2_c2.png",
+  "test_r2_c3.png",
+  "test_r2_c4.png"];
+var sprites = [];
+var speed = [];
+
+// Asset Loaderでスプライト・シートをテクスチャフレームに読み込む
+loader = new PIXI.AssetLoader(["img/test.json"]);
+loader.onComplete = onComp; // 読み込みは非同期で行われます
+loader.load(); // ロード開始!
+
+// ロード後の処理 (非同期でコールバックされます)
+function onComp()
+{
+  // テクスチャフレームからスプライトを作ってステージに並べます。
+  for(var cnt=0;cnt < framenames.length;cnt ++){
+    var name = framenames[cnt];
+    sprites.push(PIXI.Sprite.fromFrame(name));
+    sprites[cnt].position.x = Math.random() * 600;
+    sprites[cnt].position.y = Math.random() * 400;
+    sprites[cnt].anchor.x = 0.5;
+    sprites[cnt].anchor.y = 0.5;
+
+    // 前半と後半を分けてコンテナに入れる。
+    if(cnt < 4){
+      containers[0].addChild(sprites[cnt]);
+    }else{
+      containers[1].addChild(sprites[cnt]);
+    }
+
+	speed.push(Math.random());
+  }
+
+  // 次のアニメーションフレームでanimate()を呼び出してもらう
+  requestAnimFrame(animate);
+}
+
+var sel1 = 0;
+var sel2 = 1;
+var counter = 0;
+
+// アニメーション関数
+function animate(){
+	requestAnimFrame(animate); // 次の描画タイミングでanimateを呼び出す
+	for(cnt=0;cnt <sprites.length;cnt++){
+		sprites[cnt].rotation += (speed[cnt] / 10);
+		sprites[cnt].position.x += (speed[cnt]*10);
+		if(sprites[cnt].position.x > 700){
+			sprites[cnt].position.x = -200;
+			speed[cnt] = Math.random();
+			sprites[cnt].position.y = Math.random() * 400;
+		}
+	}
+	// containerを変形させる処理
+	if(counter > 100){
+		sel1 ^= 1;
+		sel2 ^= 1;
+		counter = 0;
+	}
+	containers[sel1].scale.x += 0.015;
+	containers[sel1].scale.y += 0.005;
+	containers[sel2].scale.x -= 0.015;
+	containers[sel2].scale.y -= 0.005;
+	renderer.render(stage);   // 描画する
+	counter ++;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>pixi.js ex#5</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<style>
+body {
+	margin: 0;
+	padding: 0;
+	background-color: #333;
+	color:#FFF;
+}
+#pixiview {
+	margin: 0 auto;
+	padding: 0;
+	width:600px;
+	height:400px;
+}
+#logo {
+	position:absolute;
+	bottom:15px;
+	right:15px;
+}
+
+</style>
+<script src="pixi.dev.js"></script>
+</head>
+<body>
+<p>サイズを変える</p>
+<div id="pixiview"></div>
+<a href="http://www.pixijs.com/"><img id="logo" src="img/pixilogo.png" width="56px" height="22px"></a>
+<script>
+var width = 600;
+var height = 400;
+
+// ステージを作る
+var stage = new PIXI.Stage('black');
+
+// レンダラーを作る
+var renderer = PIXI.autoDetectRenderer(width, height);
+
+// レンダラーのviewをDOMに追加する
+document.getElementById("pixiview").appendChild(renderer.view);
+
+// 画像からスプライトオブジェクトを作る
+var texture = PIXI.Texture.fromImage('img/pixilogo.png');
+var logoimg = new PIXI.Sprite(texture);
+logoimg.position.x = width / 2;
+logoimg.position.y = height / 2;
+
+// anchorでオブジェクトのアンカーポイント(positionが示す位置)を指定してみる
+logoimg.anchor.x = 0.5;
+logoimg.anchor.y = 0.5;
+
+// サイズを変える
+logoimg.width = 60;
+logoimg.height = 500;
+
+// テキストオブジェクトをステージに乗せる
+stage.addChild(logoimg);
+
+// アニメーション関数を定義する
+function animate(){
+	requestAnimFrame(animate); // 次の描画タイミングでanimateを呼び出す
+	logoimg.rotation += 0.01; // 画像を回転する
+	renderer.render(stage);   // 描画する
+}
+
+// 次のアニメーションフレームでanimate()を呼び出してもらう
+requestAnimFrame(animate);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>pixi.js ex#11</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, target-densitydpi=medium-dpi, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+body {
+	margin: 0;
+	padding: 0;
+	background-color: #333;
+	color:#FFF;
+}
+
+@media screen and (max-width: 2000px) {
+  #pixiview {
+    margin: 0 auto;
+    padding: 0;
+    width:640px;
+    height:480px;
+  }
+}
+
+@media screen and (max-width: 569px) {
+  #pixiview {
+  margin: 0 auto;
+  padding: 0;
+  width:320px;
+  height:320px;
+  }  
+}
+
+#logo {
+	position:absolute;
+	bottom:10px;
+	right:10px;
+}
+</style>
+<script src="pixi.dev.js"></script>
+</head>
+<body>
+<p>pixi.js ボタン sample</p>
+<div id="pixiview"></div>
+<a href="http://www.pixijs.com/"><img id="logo" src="img/pixilogo.png" width="56px" height="22px"></a>
+<script>
+// var width = window.width;
+// var height = window.height;
+var width;
+var height;
+
+// ステージ・レンダラーを作ってDOMに配置
+var stage = new PIXI.Stage('black');
+var prev = document.getElementById("pixiview");
+
+if(prev.clientWidth < 640){
+  width = 320;
+  height = 320;
+}else{
+  width = 640;
+  height = 480;
+}
+
+console.dir(prev);
+
+var renderer = PIXI.autoDetectRenderer(width, height);
+prev.appendChild(renderer.view);
+
+// 画像からスプライトオブジェクトを作る
+var framenames = [
+  "test_r1_c1.png",
+  "test_r1_c2.png",
+  "test_r1_c3.png",
+  "test_r1_c4.png",
+  "test_r2_c1.png",
+  "test_r2_c2.png",
+  "test_r2_c3.png",
+  "test_r2_c4.png"];
+var sprites = [];
+var speed = [];
+var spritesMax = 10;
+
+loader = new PIXI.AssetLoader(["img/test.json"]);
+loader.onComplete = onSpriteLoaded; // 読み込みは非同期で行われます
+loader.load(); // ロード開始!
+
+// ボタン
+var button;
+var texNomal;
+var texHover;
+var texClicked;
+
+// スプライトロード後の処理 (非同期でコールバックされます)
+function onSpriteLoaded()
+{
+  // テクスチャフレームからスプライトを作ってステージに並べます。
+  for(var cnt=0;cnt < spritesMax;cnt ++){
+    var name = framenames[cnt % (framenames.length)];
+    sprites.push(PIXI.Sprite.fromFrame(name));
+    sprites[cnt].position.x = Math.random() * width;
+    sprites[cnt].position.y = Math.random() * height;
+    sprites[cnt].anchor.x = 0.5;
+    sprites[cnt].anchor.y = 0.5;
+
+    stage.addChild(sprites[cnt]);
+    speed.push(Math.random());
+  }
+
+  // ボタンの読み込み
+  loader2 = new PIXI.AssetLoader(["img/button.json"]);
+  loader2.onComplete = onButtonLoaded; // 読み込みは非同期で行われます
+  loader2.load(); // ロード開始!
+
+}
+
+// ボタン画像ロード後の処理 (非同期でコールバックされます)
+function onButtonLoaded()
+{
+  button = PIXI.Sprite.fromFrame("button_normal.png");
+  button.position.x = width / 2;
+  button.position.y = height / 2;
+  button.anchor.x = 0.5;
+  button.anchor.y = 0.5;
+
+  texNomal = PIXI.Texture.fromFrame("button_normal.png");
+  texHover = PIXI.Texture.fromFrame("button_hover.png");
+  texClicked = PIXI.Texture.fromFrame("button_clicked.png");
+
+  // カスタムプロパティ
+  button.isOver = false;    // true: マウスが乗ってる false: 乗ってない
+  button.clickModeCounter = 0;  // 一定回数カウントしたら、boostValueを1に戻します。
+  button.boostValue = 1;    // 1: normal, 100: boost mode;
+
+  // ボタン状態初期化
+  button.buttonMode = true;
+  button.setInteractive(true);
+
+  // mouseover / mouseout
+  button.mouseover = function(data){
+    this.isOver = true;
+    console.log("mouseover");
+    console.dir(button);
+    this.setTexture(texHover);
+  }
+  button.mouseout = function(data){
+    this.isOver = false;
+    console.log("mouseout");
+    console.dir(button);
+    this.setTexture(texNomal);
+    this.boostValue = 1;
+  }
+  // click / tap
+  button.click = function(data){
+    console.log("click");
+    console.dir(button);
+    this.setTexture(texClicked);
+    this.boostValue = 100;
+  }
+  button.tap = function(data){
+    console.log("tap");
+    console.dir(button);
+    this.setTexture(texClicked);
+    this.boostValue = 100;
+  }
+
+  stage.addChild(button);
+
+  // 次のアニメーションフレームでanimate()を呼び出してもらう
+  requestAnimFrame(animate);
+}
+
+// アニメーション関数
+function animate(){
+
+  requestAnimFrame(animate); // 次の描画タイミングでanimateを呼び出す
+
+  // クリック中はSpriteを速く動かす
+  if(button.boostValue != 1){
+    button.clickModeCounter ++;
+    if(button.clickModeCounter > 60){
+       button.boostValue = 1;
+       button.clickModeCounter = 1;
+       if(button.isOver == true){
+         button.setTexture(texHover);
+       }else{
+         button.setTexture(texNormal);
+       }
+    }
+  }
+  for(cnt=0;cnt <sprites.length;cnt++){
+    sprites[cnt].rotation += (speed[cnt]*button.boostValue / 10);
+    sprites[cnt].position.x += (speed[cnt]*button.boostValue*10);
+    if(sprites[cnt].position.x > (width + 100)){
+      sprites[cnt].position.x = -200;
+      speed[cnt] = Math.random();
+      sprites[cnt].position.y = Math.random() * height;
+    }
+  }
+  renderer.render(stage);   // 描画する
+}
+</script>
+</body>
+</html>

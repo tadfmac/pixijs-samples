@@ -1,0 +1,33 @@
+{"frames": {
+	"button_normal.png":
+	{
+		"frame": {"x":0,"y":0,"w":240,"h":80},
+		"rotated": false,
+		"trimmed": false,
+		"spriteSourceSize": {"x":0,"y":0,"w":240,"h":80},
+		"sourceSize": {"w":240,"h":80}
+	},
+	"button_hover.png":
+	{
+		"frame": {"x":0,"y":80,"w":240,"h":80},
+		"rotated": false,
+		"trimmed": false,
+		"spriteSourceSize": {"x":0,"y":0,"w":240,"h":80},
+		"sourceSize": {"w":240,"h":80}
+	},
+	"button_clicked.png":
+	{
+		"frame": {"x":0,"y":160,"w":240,"h":80},
+		"rotated": false,
+		"trimmed": false,
+		"spriteSourceSize": {"x":0,"y":0,"w":240,"h":80},
+		"sourceSize": {"w":240,"h":80}
+	}
+},
+"meta": {
+	"image": "button.png",
+	"format": "RGBA8888",
+	"size": {"w":240,"h":240},
+	"scale": "1"
+}
+}

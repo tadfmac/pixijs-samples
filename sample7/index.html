@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>pixi.js ex#7</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<style>
+body {
+	margin: 0;
+	padding: 0;
+	background-color: #333;
+	color:#FFF;
+}
+#pixiview {
+	margin: 0 auto;
+	padding: 0;
+	width:600px;
+	height:400px;
+}
+#logo {
+	position:absolute;
+	bottom:15px;
+	right:15px;
+}
+
+</style>
+<script src="pixi.dev.js"></script>
+</head>
+<body>
+<p>雪?</p>
+<div id="pixiview"></div>
+<a href="http://www.pixijs.com/"><img id="logo" src="img/pixilogo.png" width="56px" height="22px"></a>
+<script>
+var width = 600;
+var height = 400;
+
+// ステージを作る
+var stage = new PIXI.Stage('black');
+
+// レンダラーを作る
+var renderer = PIXI.autoDetectRenderer(width, height);
+
+// レンダラーのviewをDOMに追加する
+document.getElementById("pixiview").appendChild(renderer.view);
+
+// 画像からスプライトオブジェクトを作る
+var texture = PIXI.Texture.fromImage('img/snow2.png');
+var MAX_SNOW = 300;
+var snowimgs = [];
+
+// 雪。
+for(var cnt=0;cnt < MAX_SNOW;cnt ++){
+  snowimgs.push(new PIXI.Sprite(texture));
+  snowimgs[cnt].position.x = Math.random() * 600;
+  snowimgs[cnt].position.y = Math.random() * 400;
+  snowimgs[cnt].anchor.x = 0.5;
+  snowimgs[cnt].anchor.y = 0.5;
+  var base = Math.random();
+  snowimgs[cnt].alpha = (base/2) + 0.4;
+  snowimgs[cnt].scale.x = base/2;
+  snowimgs[cnt].scale.y = base/2;
+  stage.addChild(snowimgs[cnt]);
+}
+
+// アニメーション関数を定義する
+function animate(){
+	requestAnimFrame(animate); // 次の描画タイミングでanimateを呼び出す
+	for(cnt=0;cnt <MAX_SNOW;cnt++){
+		var scale = snowimgs[cnt].scale.x;
+		snowimgs[cnt].position.x += scale * (Math.random() - 0.5) * 4;
+		snowimgs[cnt].position.y += (scale * 3) + 1;
+		if(snowimgs[cnt].position.y > 400){
+			snowimgs[cnt].position.y = -10;
+		}
+	}
+	renderer.render(stage);   // 描画する
+}
+
+// 次のアニメーションフレームでanimate()を呼び出してもらう
+requestAnimFrame(animate);
+</script>
+</body>
+</html>
